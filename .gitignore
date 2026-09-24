@@ -1,0 +1,10 @@
+.env*
+*.log
+*credentials*
+*secret*
+*.pem
+*.key
+*.p12
+*.pfx
+financial_loan.csv
+data/

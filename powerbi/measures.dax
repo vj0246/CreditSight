@@ -1,0 +1,55 @@
+// Create these as individual model measures on financial_loan.
+// The table contract is one row per loan, with decimal ratios in dti and int_rate.
+// Format Avg Interest Rate, Avg DTI, Charged Off Share of Resolved, and MoM Growth as percentages.
+// Format amount measures as currency. Use MonthYear sorted by YearMonth on monthly visuals.
+
+Total Loans = COUNTROWS(financial_loan)
+
+Listed Loan Amount = SUM(financial_loan[loan_amount])
+
+Avg Interest Rate = AVERAGE(financial_loan[int_rate])
+
+Avg DTI = AVERAGE(financial_loan[dti])
+
+Fully Paid Loans =
+CALCULATE(
+    [Total Loans],
+    financial_loan[loan_status] = "Fully Paid"
+)
+
+Charged Off Loans =
+CALCULATE(
+    [Total Loans],
+    financial_loan[loan_status] = "Charged Off"
+)
+
+Resolved Loans =
+CALCULATE(
+    [Total Loans],
+    financial_loan[loan_status] IN {"Fully Paid", "Charged Off"}
+)
+
+Charged Off Share of Resolved =
+DIVIDE([Charged Off Loans], [Resolved Loans])
+
+Listed Amount Charged Off =
+CALCULATE(
+    [Listed Loan Amount],
+    financial_loan[loan_status] = "Charged Off"
+)
+
+Previous Month Listed Amount =
+CALCULATE(
+    [Listed Loan Amount],
+    DATEADD(DimDate[Date], -1, MONTH)
+)
+
+MoM Growth =
+VAR PriorAmount = [Previous Month Listed Amount]
+RETURN DIVIDE([Listed Loan Amount] - PriorAmount, PriorAmount)
+
+YTD Listed Amount =
+CALCULATE(
+    [Listed Loan Amount],
+    DATESYTD(DimDate[Date])
+)

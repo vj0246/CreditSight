@@ -1,0 +1,16 @@
+.env*
+node_modules/
+__pycache__/
+.next/
+dist/
+build/
+*.log
+.git/
+*credentials*
+*secret*
+*.pem
+*.key
+*.p12
+*.pfx
+financial_loan.csv
+data/
