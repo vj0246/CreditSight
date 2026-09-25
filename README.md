@@ -1,38 +1,40 @@
 # Bank Loan Credit Risk Dashboard
 
-Historical loan analysis project using MySQL, Power BI, SQL CTEs, and DAX. The report is intended to compare origination volume and observed repayment outcomes by credit grade, debt-to-income band, and issue month.
+Historical LendingClub loan origination and observed outcome analysis using MySQL 8, SQL CTEs, Power BI, Power Query, and DAX. The repository contains the reproducible data preparation, SQL, and report formulas. **The PBIX and public report are not built yet.** See [YOUR_STEPS.md](YOUR_STEPS.md) for signed-in Workbench and Power BI actions.
 
-## Current status
+## Source and scope
 
-Source validation and SQL/model code are prepared. The Power BI report and public link are not yet built. The copied 24-column CSV has unreliable issue dates, so its monthly trend must not be presented as historical fact. A verified historical source choice is pending. See [YOUR_STEPS.md](YOUR_STEPS.md) for the exact handoff steps.
+The source is LendingClub's [LoanStats3a historical archive](https://resources.lendingclub.com/LoanStats3a.csv.zip), SHA-256 `6f93fc97f0ad26718ed66c6199931ac6204ce80d7c14da0215b529b0891f12be`. `tools/prepare_official_data.py` selects 39,786 `Fully Paid` or `Charged Off` loans from 42,535 source records. It excludes 2,749 records with other credit-policy statuses, converts percentage fields to decimal ratios, and maps issue month to its first day for date-table use. The archive's public loan ID is blank, so `loan_record_key` is the stable row number in this archive snapshot, not a real loan ID.
 
-## Sources
+An earlier 24-column copy (`financial_loan.csv`) is retained locally but rejected for time analysis: its 2021 issue dates disagree with the corresponding original 2007–2011 archive records. Neither source file nor generated data is committed. The selected cohort is historical and non-random; its observed outcomes should not be presented as current portfolio performance or forward-looking default probability.
 
-- Copied 24-column CSV: [anuragsh03/Bank-Loan-Data-Analysis](https://github.com/anuragsh03/Bank-Loan-Data-Analysis), 38,576 rows. Stored locally as ignored `financial_loan.csv`.
-- Original historical archive: [LendingClub LoanStats3a.csv.zip](https://resources.lendingclub.com/LoanStats3a.csv.zip), 42,535 loan rows spanning June 2007 to December 2011. Stored locally under ignored `data/`.
+## Verified local figures
 
-The copied CSV's issue date disagrees with the historical archive for a matching loan record. No public report should treat those copied dates as verified origination dates. Source files stay out of Git pending a decision on provenance and redistribution.
+These values come from `python tools/verify_clean_data.py` on the prepared CSV. Reconcile them with MySQL and DAX before using them in a public report.
 
-## Metric definitions
+| Measure | Value |
+|---|---:|
+| Resolved loans | 39,786 |
+| Charged-off loans / resolved | 5,670 / 39,786 = 14.25% |
+| Funded amount | $436,003,725.00 |
+| Total received (`total_pymnt`) | $486,688,031.90 |
+| Average interest / DTI | 12.03% / 13.32% |
+| Grade A observed charge-off share | 602 / 10,085 = 5.97% |
+| Grade G observed charge-off share | 101 / 318 = 31.76% |
+| DTI <10% | 1,637 / 13,219 = 12.38% |
+| DTI >=20% | 1,217 / 7,529 = 16.16% |
+| Peak funded issue month | December 2011, $31,007,025 across 2,267 loans |
 
-- **Loan count:** one row per loan in the prepared reporting table.
-- **Listed loan amount:** sum of `loan_amount`. This is neither outstanding balance nor realized loss.
-- **Resolved loans:** `Fully Paid` plus `Charged Off`.
-- **Observed charged-off share of resolved:** charged-off loan count divided by resolved loan count. This is a historical outcome comparison, not a predicted default probability.
-- **Current loans:** unresolved; excluded from the resolved denominator when present.
-- **Month-over-month growth:** change in listed loan amount by verified issue month.
+High-DTI share is about 1.30 times low-DTI share, not the 2.5–3.5 times claimed by the initial project outline. This is an unadjusted association; grade, vintage, and other factors may confound it. `funded_amount` is original funded principal, **not** outstanding balance or credit loss. Monthly outcome rates group loans by origination month, not the month in which charge-off happened.
 
-## Repository map
+## Reproduce
 
-- `sql/00_create_database.sql`: database setup
-- `sql/01_profile_data.sql`: source checks
-- `sql/02_basic_queries.sql`: baseline reconciliation queries
-- `sql/03_cte_grade_risk.sql`, `sql/04_cte_dti_segments.sql`, `sql/05_cte_monthly_growth.sql`: layered analysis
-- `powerbi/DimDate.m`: date dimension query
-- `powerbi/measures.dax`: 12 report measures
-- `tools/`: reproducible source profiling scripts
-- `YOUR_STEPS.md`: actions needed on the Windows machine
+1. Place the archive at `data/LoanStats3a.csv.zip` and run `python tools/prepare_official_data.py` followed by `python tools/verify_clean_data.py`.
+2. In MySQL Workbench, run `sql/00_create_database.sql`; import `data/financial_loan_clean.csv` into its existing table via **Table Data Import Wizard**.
+3. Run `sql/01_profile_data.sql`, then `sql/02_basic_queries.sql` and `sql/03`–`05` CTE scripts. Compare against the verified local figures.
+4. In Power BI Desktop, connect to `bank_loan_db.financial_loan`, create `DimDate` from `powerbi/DimDate.m`, build the one-to-many date relationship, and create the 12 formulas in `powerbi/measures.dax` as individual measures.
+5. Build Summary, Risk Analysis, and Monthly Trends pages per [YOUR_STEPS.md](YOUR_STEPS.md). Save the PBIX and screenshots only after SQL-to-DAX checks pass.
 
-## Run locally
+## Publication status
 
-Use MySQL Workbench to run the SQL scripts in filename order after importing the selected, cleaned source as `bank_loan_db.financial_loan`. Validate its dates and decimal rate units before running monthly analysis or building visuals. Keep database credentials in Workbench and Power BI credential stores.
+No public dashboard link or GitHub remote has been verified. Power BI's MySQL connector requires Oracle Connector/NET; a localhost MySQL source needs a standard gateway for Service refresh. **Publish to web exposes the underlying model data publicly**, so confirm redistribution rights and tenant permission first. A static screenshot or private walkthrough is safer if those cannot be confirmed.

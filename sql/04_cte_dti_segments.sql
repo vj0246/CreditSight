@@ -7,7 +7,7 @@ WITH segmented AS (
     SELECT
         grade,
         loan_status,
-        loan_amount,
+        funded_amount,
         CASE
             WHEN dti IS NULL THEN 'Unknown'
             WHEN dti < 0.10 THEN 'Low: <10%'
@@ -25,7 +25,7 @@ grade_band_counts AS (
             THEN 1 ELSE 0 END) AS resolved_loans,
         SUM(CASE WHEN loan_status = 'Charged Off'
             THEN 1 ELSE 0 END) AS charged_off_loans,
-        SUM(loan_amount) AS listed_loan_amount
+        SUM(funded_amount) AS funded_amount
     FROM segmented
     GROUP BY dti_band, grade
 )
@@ -37,7 +37,7 @@ SELECT
     charged_off_loans,
     ROUND(100.0 * charged_off_loans / NULLIF(resolved_loans, 0), 2)
         AS charged_off_share_of_resolved_pct,
-    listed_loan_amount
+    funded_amount
 FROM grade_band_counts
 ORDER BY FIELD(dti_band, 'Low: <10%', 'Medium: 10-<20%', 'High: >=20%', 'Unknown'), grade;
 

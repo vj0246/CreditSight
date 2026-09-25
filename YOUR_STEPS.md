@@ -1,78 +1,62 @@
-# Your actions: Bank Loan Credit Risk Dashboard
+# Your steps: Bank Loan Credit Risk Dashboard
 
-This file is the handoff checklist. Complete Day 1 in order, then send the requested results so the SQL and Power BI model can be tied to your exact CSV. Do not put passwords or credentials in this repository or in chat.
+Follow the days in order. Code and source preparation are already in this repository. Steps marked **You** require your signed-in desktop or service session. Never paste MySQL passwords or account credentials into chat or Git.
 
-## Current workspace status
+## Current status
 
-- MySQL Server 8.0.42 and Workbench are installed; the `MySQL80` service is running.
-- The copied `financial_loan.csv` is present and profiled: 38,576 rows, 38,576 distinct IDs, no missing required fields. Its issue dates disagree with LendingClub's historical source. Do not use its month chart as a historical lending trend.
-- LendingClub's official historical archive is present in ignored `data/LoanStats3a.csv.zip`. Source choice is pending: switch to it for accurate issue months, or keep the copied CSV with an explicit date limitation.
-- Root database access requires your local password. Run SQL in Workbench; never send the password.
-- Power BI Desktop is absent. Installation failed while C: had about 389 MB free. Free several GB before the Desktop build can proceed.
+- **Prepared:** MySQL 8.0.42, Workbench, Power BI Desktop, official historical archive, a cleaned 39,786-loan CSV, SQL scripts, a date-table query, 12 DAX measures, and local source checks.
+- **Not yet verified:** MySQL import and query results, Power BI model and visuals, PBIX file, screenshots, Service publication, and public GitHub link. C: has only about 255 MB free; free several GB before installing the connector or working in Desktop. Windows has already reported a paging-file error.
+- **Source decision:** Use `data/financial_loan_clean.csv`, generated from `data/LoanStats3a.csv.zip`. Ignore the older root `financial_loan.csv`: its 2021 issue dates contradict the original archive.
+- **Metric meaning:** `issue_date` is the first day of the source's issue month, not an exact issuance day. Every selected loan has a resolved `Fully Paid` or `Charged Off` status. The charged-off share is an observed outcome, not predicted default risk or realized loss.
 
-The older Day 1 instructions below remain as a reproducibility guide. Steps 1–3 are already handled on this machine; complete the Workbench import and send query results after choosing the data source.
+## Day 1: load and profile in MySQL
 
-## Day 1: setup and source verification
+1. **You:** Open MySQL Workbench and connect to `MySQL80` with your existing local credentials. No password needs to be sent to me.
+2. **You:** Run `sql/00_create_database.sql`. This creates `bank_loan_db.financial_loan` with explicit types. Do not create another table through the import wizard.
+3. **You:** In the Schemas panel, right-click `bank_loan_db`, choose **Table Data Import Wizard**, select `data/financial_loan_clean.csv`, and choose the **existing** `financial_loan` table. Match all 16 CSV columns to their same-named table columns. Confirm the first CSV row is treated as headers. Import once.
+4. **You:** Run `sql/01_profile_data.sql` one statement at a time. Expected: `row_count = distinct_record_keys = 39786`; statuses `Fully Paid = 34116`, `Charged Off = 5670`; issue range `2007-06-01` to `2011-12-01`; `dates_not_at_month_start = 0`; `issue_months = 55`; no required missing or nonpositive amounts.
+5. **You:** Run `sql/02_basic_queries.sql`. Compare portfolio and status outputs to `python tools/verify_clean_data.py`. Save result grids or screenshots. If any count differs, stop before Power BI and check import mapping or duplicate imports.
 
-1. Install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/) 8.0+ and [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) on Windows. Confirm Workbench connects to your local server. Save the database password in your password manager.
-2. Download one exact `financial_loan.csv` source. Suggested file to inspect: [anuragsh03/Bank-Loan-Data-Analysis](https://github.com/anuragsh03/Bank-Loan-Data-Analysis), which lists a CSV and a repository MIT license. Record the URL you actually use. Do not assume that the repository license establishes ownership of the underlying data.
-3. Place the CSV in this project root as `financial_loan.csv`. The file is ignored by Git until its provenance and publication rights are clear.
-4. In MySQL Workbench, open and run `sql/00_create_database.sql`.
-5. In Workbench's Schemas panel, right-click `bank_loan_db` and choose **Table Data Import Wizard**. Select the CSV, create table `financial_loan`, and review all column names and inferred types before finishing. `issue_date` must become `DATE` or `DATETIME`; numeric columns must be numeric. If the wizard cannot parse dates, stop and report the raw date format. Do not guess a conversion format.
-6. Run `sql/01_profile_data.sql`, one statement at a time. Check that `row_count = distinct_loan_ids`, required fields have no unexpected nulls, statuses are understood, and dates are valid. Write down raw DTI and interest ranges; do not convert them yet.
-7. If profiling passes, run all five statements in `sql/02_basic_queries.sql`. Save the result grids or export each result as CSV. Record exact row count, first and last issue dates, status counts, Grade A/G counts and rates, and highest-volume month.
-8. Sign in to [Power BI Service](https://app.powerbi.com/) with a work or education account and note the license shown under your profile. If an administrator controls the account, ask whether **Publish to web** is allowed. The final public-link test happens on Day 6, after a report exists. A normal Share link is not a public recruiter link. Do not publish any data yet.
+## Day 2: run analytical SQL
 
-### Send back after Day 1
+1. **You:** Run `sql/03_cte_grade_risk.sql`, `sql/04_cte_dti_segments.sql`, and `sql/05_cte_monthly_growth.sql` in that order. Save results.
+2. Compare Grade A/G and DTI band counts and rates with the verifier output. Month results show origination cohorts and their eventual outcomes, not the calendar month in which a charge-off occurred.
+3. Record two highest/lowest MoM changes only with their prior-month counts; very early months have tiny bases and can create misleading percentage swings.
 
-- CSV source URL and confirmation that `financial_loan.csv` is in this folder.
-- MySQL version and whether import completed.
-- Output of profile steps 2–5 from `sql/01_profile_data.sql` (no credentials).
-- Any SQL or import error text.
-- Whether Power BI Service sign-in works, your license type, and any known Publish to web restriction.
+## Day 3: build the Power BI model
 
-## Day 2: SQL risk analysis
-
-1. After importing the chosen, cleaned source, run `sql/03_cte_grade_risk.sql` and `sql/04_cte_dti_segments.sql` in Workbench.
-2. Confirm Grade A/G loan counts and DTI band counts against the source profile. Compare rates only among `Fully Paid` and `Charged Off` loans; `Current` is unresolved.
-3. Run `sql/05_cte_monthly_growth.sql` only if the chosen source has verified issue dates. The copied CSV's issue dates cannot support a truthful historical trend.
-4. Save the result grids for later SQL-to-DAX reconciliation. Do not write a headline insight until the chosen source and exact counts are fixed.
-
-## Day 3: Power BI model
-
-1. After freeing disk space, install [Power BI Desktop](https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-get-the-desktop) and [Oracle MySQL Connector/NET](https://dev.mysql.com/downloads/connector/net/). Restart Power BI Desktop after installing the connector.
-2. In Desktop, choose **Get Data > MySQL database**. Server: `localhost`; database: `bank_loan_db`; mode: **Import**. Sign in with your local database credentials in the app.
-3. Choose table `financial_loan`, then **Transform Data**. Keep its query name `financial_loan`; the prepared DAX uses that name. Confirm `issue_date` is Date, `loan_amount` numeric, `dti` and `int_rate` decimal ratios.
-   Add a Custom Column named `DTIBand` with this Power Query expression: `if [dti] = null then "Unknown" else if [dti] < 0.10 then "Low: <10%" else if [dti] < 0.20 then "Medium: 10-<20%" else "High: >=20%"`. Set its type to Text.
-4. Create a **Blank Query** named `DimDate`; paste the full contents of `powerbi/DimDate.m` into Advanced Editor. Close & Apply.
-5. In Model view, connect `DimDate[Date]` (one side) to `financial_loan[issue_date]` (many side), with single-direction filtering. Mark `DimDate` as the date table using its `Date` column.
-6. In Data view, select `DimDate[MonthYear]` and set **Sort by column** to `DimDate[YearMonth]`. Verify dates span the chosen source's actual range.
+1. **You:** After freeing disk space, install [Oracle MySQL Connector/NET](https://dev.mysql.com/downloads/connector/net/). The verified Oracle 26.7.0 installer is already at `data/mysql-connector-net-26.7.0.msi` (MD5 `ac9249c8957115da437366a55ffab7c1`). Restart Power BI Desktop after installation. Desktop itself is installed.
+2. **You:** In Desktop, use **Get Data > MySQL database**. Server `localhost`, database `bank_loan_db`, mode **Import**. Authenticate within Desktop and select `financial_loan > Transform Data`. Keep the table name `financial_loan`.
+3. Set `issue_date` to Date; amount, `dti`, and `int_rate` to Decimal Number. Add Power Query custom column `DTIBand` with `if [dti] = null then "Unknown" else if [dti] < 0.10 then "Low: <10%" else if [dti] < 0.20 then "Medium: 10-<20%" else "High: >=20%"` and set it to Text.
+4. Create a blank query named `DimDate`, paste the full contents of `powerbi/DimDate.m` in Advanced Editor, then **Close & Apply**.
+5. In Model view, relate `DimDate[Date]` (one) to `financial_loan[issue_date]` (many), single-direction. Mark `DimDate` as the date table using `[Date]`. Sort `DimDate[MonthYear]` by `[YearMonth]`.
 
 ## Day 4: measures and reconciliation
 
-1. Create each of the 12 formulas in `powerbi/measures.dax` as a separate measure on `financial_loan`. Do not paste the whole file into one measure.
-2. Format rate and DTI measures as Percentage with two decimals; amount measures as Currency. Avoid `FORMAT()` inside measures because it turns numbers into text.
-3. Add temporary cards for `Total Loans`, `Listed Loan Amount`, `Charged Off Loans`, and `Resolved Loans`; compare each with SQL. Add a grade table and compare Grade A/G counts and rates. Add a `MonthYear` table and compare at least two monthly amounts with SQL.
-4. Resolve any mismatch before building pages. Check source selection, date types, relationship direction, and status spelling.
+1. **You:** Create each of the 12 formulas in `powerbi/measures.dax` as a separate measure on `financial_loan`. The `.dax` file is a reference list, not a one-click import.
+2. Format `Avg Interest Rate`, `Avg DTI`, `Charged Off Share of Resolved`, and `MoM Growth` as Percentage (two decimals). Format funded and received measures as USD currency. Leave counts as whole numbers.
+3. Put `Total Loans`, `Total Funded`, `Total Received`, and `Charged Off Loans` on temporary cards. Expected: 39,786; $436,003,725; $486,688,031.90; 5,670. Compare Grade A/G and at least two month values against saved SQL. Resolve any mismatch before making pages.
 
-## Day 5: report pages
+## Day 5: create three report pages
 
-1. **Summary:** four cards (`Total Loans`, `Listed Loan Amount`, `Charged Off Share of Resolved`, `Avg Interest Rate`); a status bar chart (`loan_status` by `Total Loans`); a grade bar chart (`grade` by `Total Loans`); a monthly line chart (`DimDate[MonthYear]` by `Total Loans`). Add a year slicer only if the chosen source contains multiple years.
-2. **Risk Analysis:** a matrix with `grade` rows, `DTIBand` columns, and `Resolved Loans` plus `Charged Off Share of Resolved` values; a purpose bar chart; and a grade scatter chart with average DTI, average interest, and sample size. Never put `loan_status` on the matrix columns for the charged-off rate measure.
-3. **Monthly Trends:** use `DimDate[MonthYear]` on every time axis, sorted by `YearMonth`. Show monthly amount, a separate YTD view, a MoM growth chart, and a detail table with loan count and amount. Do not put monthly and YTD amounts on the same scale.
-4. Use consistent labels and navigation. Keep `Current` visually separate if present. Show sample sizes beside risk rates and explain that the data is historical.
-   In **Format > Edit interactions**, stop the status chart from filtering charged-off-rate visuals; selecting a single status would change the meaning of their denominator.
+1. **Summary:** cards for `Total Loans`, `Total Funded`, `Charged Off Share of Resolved`, and `Avg Interest Rate`; status and grade bar charts; monthly loan-count line chart. Add a Year slicer. Chart titles should say **issue month** or **origination**, never **charge-off month**.
+2. **Risk Analysis:** matrix with `grade` rows, `DTIBand` columns, and `Resolved Loans` plus `Charged Off Share of Resolved` values; purpose bar chart; grade scatter using `Avg DTI`, `Avg Interest Rate`, and `Total Loans` as bubble size. Display counts beside every rate. Small Grade G sample: 318 loans.
+3. **Monthly Trends:** use `DimDate[MonthYear]` on every time axis. Show monthly `Total Funded`, `YTD Funded` in a separate visual, `MoM Growth`, and a detail table with `Total Loans` and `Total Funded`. Do not mix monthly and cumulative amounts on one unlabelled scale.
+4. Use **Format > Edit interactions** to check chart selection behavior. A slicer should filter all intended visuals; status selections should not silently change the rate denominator. Add page navigation only after the three pages and filters work.
 
-## Day 6: publication and GitHub
+## Day 6: publish only after validation
 
-1. Check all three pages at normal desktop width, filter every visual, and compare the monthly detail table with SQL.
-2. Save the PBIX. Publish it to your Power BI Service workspace. A local MySQL connection needs a standard on-premises gateway for refresh; without one, describe the report as an imported historical snapshot.
-3. If the tenant permits it and the dataset can be exposed publicly, create a **Publish to web** link. Test it in an incognito window. Do not use a normal Share link as a public portfolio URL.
-4. Create a public GitHub repository with the PBIX, SQL, source-processing scripts, three report screenshots, and a README containing verified metrics and source attribution. Keep source CSV/ZIP and credentials out of Git unless redistribution rights are confirmed.
+1. **You:** Save `bank_loan_dashboard.pbix` in the project root and export one screenshot per page into `screenshots/`. Open the PBIX again and recheck the four Day 4 totals.
+2. **You:** Sign in to Power BI Service with your work or education account. Publish to **My Workspace** if your license and tenant allow it. This MySQL Import model is a historical snapshot; scheduled refresh from localhost needs a standard on-premises gateway.
+3. **You:** Check whether public reuse of this historical source is permitted before using **Publish to web**. That feature exposes underlying model data to anyone, not just chart images. A normal Share link usually is not an anonymous recruiter link. Test any public link in incognito.
+4. **You:** Create a public GitHub repo and push the tracked project files plus the validated PBIX/screenshots if publication is permitted. The raw ZIP, clean CSV, old copied CSV, and credentials are ignored. Add the verified Power BI link to `README.md` only after it works anonymously.
 
 ## Day 7: interview proof
 
-1. Record exact portfolio, grade, DTI, and month figures from the final source. Note sample size beside each rate.
-2. Practice a one-minute explanation of the source, SQL checks, date model, 12 measures, and the strongest measured finding.
-3. Explain that a charged-off share among resolved loans is an observed historical outcome, not a forward-looking default probability. Discuss differences by grade and DTI as associations, not proof of causation.
-4. Verify the PBIX opens, screenshots match it, GitHub is public, and the public link works without sign-in before adding links to a resume.
+1. Memorize exact counts with denominators: 39,786 loans; 5,670 charged off (14.25%); Grade A 602/10,085 (5.97%); Grade G 101/318 (31.76%); high DTI 1,217/7,529 (16.16%); low DTI 1,637/13,219 (12.38%).
+2. Explain why the copied source was rejected, why month-year dates were normalized, why only resolved statuses were selected, and how SQL totals were reconciled to DAX.
+3. Do not claim DTI causes charge-off, Grade G is underpriced, or that funded amount equals loss. These data support descriptive association only. State cohort size and limitations in the pitch.
+
+### What to send me after Day 1
+
+Send the non-sensitive output of the row-count/status/date checks, any import or SQL error text, and whether Power BI Desktop can connect to MySQL. No password or screenshots containing credentials.

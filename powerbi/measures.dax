@@ -5,17 +5,13 @@
 
 Total Loans = COUNTROWS(financial_loan)
 
-Listed Loan Amount = SUM(financial_loan[loan_amount])
+Total Funded = SUM(financial_loan[funded_amount])
+
+Total Received = SUM(financial_loan[total_payment])
 
 Avg Interest Rate = AVERAGE(financial_loan[int_rate])
 
 Avg DTI = AVERAGE(financial_loan[dti])
-
-Fully Paid Loans =
-CALCULATE(
-    [Total Loans],
-    financial_loan[loan_status] = "Fully Paid"
-)
 
 Charged Off Loans =
 CALCULATE(
@@ -32,24 +28,24 @@ CALCULATE(
 Charged Off Share of Resolved =
 DIVIDE([Charged Off Loans], [Resolved Loans])
 
-Listed Amount Charged Off =
+Funded Amount Charged Off =
 CALCULATE(
-    [Listed Loan Amount],
+    [Total Funded],
     financial_loan[loan_status] = "Charged Off"
 )
 
-Previous Month Listed Amount =
+Previous Month Funded =
 CALCULATE(
-    [Listed Loan Amount],
+    [Total Funded],
     DATEADD(DimDate[Date], -1, MONTH)
 )
 
 MoM Growth =
-VAR PriorAmount = [Previous Month Listed Amount]
-RETURN DIVIDE([Listed Loan Amount] - PriorAmount, PriorAmount)
+VAR PriorAmount = [Previous Month Funded]
+RETURN DIVIDE([Total Funded] - PriorAmount, PriorAmount)
 
-YTD Listed Amount =
+YTD Funded =
 CALCULATE(
-    [Listed Loan Amount],
+    [Total Funded],
     DATESYTD(DimDate[Date])
 )
