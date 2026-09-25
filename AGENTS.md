@@ -39,7 +39,7 @@ Purpose: Build a seven-day MySQL-to-Power BI portfolio report on loan originatio
 - Prepared DTI and interest are decimal ratios; original archive stores percentage-point values.
 - `loan_amount` is listed principal; `funded_amount` is funded principal, not outstanding exposure or loss.
 - The copied 24-column CSV's 2021 issue dates disagree with LendingClub's original 2007-2011 archive; do not use its monthly trend as historical fact.
-- Power BI Desktop is installed, but C: has about 255 MB free and Windows reported a paging-file error; free several GB before connector installation or report work.
+- Power BI Desktop is installed, but C: free space fluctuated from about 255 MB to 2.2 GB and Windows reported a paging-file error; free several GB before report work.
 - Oracle Connector/NET installer is downloaded and checksum-verified, not installed. Authenticated Workbench import remains to verify.
 - Use Table Data Import Wizard for CSV, not Server Data Import.
 - A local MySQL source requires a standard gateway for Power BI Service refresh.

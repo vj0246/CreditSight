@@ -5,7 +5,7 @@ Follow the days in order. Code and source preparation are already in this reposi
 ## Current status
 
 - **Prepared:** MySQL 8.0.42, Workbench, Power BI Desktop, official historical archive, a cleaned 39,786-loan CSV, SQL scripts, a date-table query, 12 DAX measures, and local source checks.
-- **Not yet verified:** MySQL import and query results, Power BI model and visuals, PBIX file, screenshots, Service publication, and public GitHub link. C: has only about 255 MB free; free several GB before installing the connector or working in Desktop. Windows has already reported a paging-file error.
+- **Not yet verified:** MySQL import and query results, Power BI model and visuals, PBIX file, screenshots, Service publication, and public GitHub link. C: free space fluctuated from about 255 MB to 2.2 GB during this run; free several GB before working in Desktop. Windows already reported a paging-file error.
 - **Source decision:** Use `data/financial_loan_clean.csv`, generated from `data/LoanStats3a.csv.zip`. Ignore the older root `financial_loan.csv`: its 2021 issue dates contradict the original archive.
 - **Metric meaning:** `issue_date` is the first day of the source's issue month, not an exact issuance day. Every selected loan has a resolved `Fully Paid` or `Charged Off` status. The charged-off share is an observed outcome, not predicted default risk or realized loss.
 
