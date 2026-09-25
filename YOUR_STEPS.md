@@ -244,6 +244,6 @@ Before placing visuals, import `powerbi/theme.json` from **View > Themes > Brows
 
 **Day 7 exit condition:** You can open the report, explain any displayed number, and state its limitations without reading a script.
 
-## Send me your Day 1 check when ready
+## What still needs your signed-in actions
 
-Send the non-sensitive outputs for `row_count`, status counts, and Day 1 query 1. I can then confirm whether your local MySQL import matches the prepared CSV before you proceed to Day 2. Do not send credentials.
+Send the non-sensitive outputs for Day 1 `row_count`, status counts, and query 1 so the local MySQL import can be independently reconciled. Upload the prepared CSV to your work/school OneDrive or SharePoint, then complete Days 3 through 6 inside your signed-in Power BI Desktop and Service. No PBIX, Service refresh schedule, or public Power BI link can be claimed until those checks pass. Do not send credentials.
