@@ -1,6 +1,6 @@
 # Bank Loan Credit Risk Dashboard
 
-Historical LendingClub loan origination and observed outcome analysis using MySQL 8, SQL CTEs, Power BI, Power Query, and DAX. The repository contains the reproducible data preparation, SQL, and report formulas. **The PBIX and public report are not built yet.** See [YOUR_STEPS.md](YOUR_STEPS.md) for signed-in Workbench and Power BI actions.
+Historical LendingClub loan origination and observed outcome analysis using MySQL 8, SQL CTEs, Power BI, Power Query, and DAX. The repository contains reproducible data preparation, SQL, and report formulas. A [public interactive companion dashboard](https://bank-loan-ledger-vj.neev-jain244.chatgpt.site) is live using verified aggregates only. **The Power BI PBIX and Service report are not built yet.** See [YOUR_STEPS.md](YOUR_STEPS.md) for signed-in actions.
 
 ## Source and scope
 
@@ -32,9 +32,9 @@ High-DTI share is about 1.30 times low-DTI share, not the 2.5–3.5 times claime
 1. Place the archive at `data/LoanStats3a.csv.zip` and run `python tools/prepare_official_data.py` followed by `python tools/verify_clean_data.py`.
 2. In MySQL Workbench, run `sql/00_create_database.sql`; import `data/financial_loan_clean.csv` into its existing table via **Table Data Import Wizard**.
 3. Run `sql/01_profile_data.sql`, then `sql/02_basic_queries.sql` and `sql/03`–`05` CTE scripts. Compare against the verified local figures.
-4. In Power BI Desktop, connect to `bank_loan_db.financial_loan`, create `DimDate` from `powerbi/DimDate.m`, build the one-to-many date relationship, and create the 12 formulas in `powerbi/measures.dax` as individual measures.
+4. Upload the prepared CSV to work/school OneDrive or SharePoint. In Power BI Desktop, create `financial_loan` from `powerbi/FactLoans_SharePoint.m`, then create `DimDate` from `powerbi/DimDate.m`, the one-to-many date relationship, and the 12 formulas in `powerbi/measures.dax` as individual measures. MySQL is the independent SQL validation layer; Power BI reads the cloud CSV for refresh.
 5. Build Summary, Risk Analysis, and Monthly Trends pages per [YOUR_STEPS.md](YOUR_STEPS.md). Save the PBIX and screenshots only after SQL-to-DAX checks pass.
 
 ## Publication status
 
-No public dashboard link or GitHub remote has been verified. Power BI's MySQL connector requires Oracle Connector/NET; a localhost MySQL source needs a standard gateway for Service refresh. **Publish to web exposes the underlying model data publicly**, so confirm redistribution rights and tenant permission first. A static screenshot or private walkthrough is safer if those cannot be confirmed.
+The [companion dashboard](https://bank-loan-ledger-vj.neev-jain244.chatgpt.site) is public and interactive but is a fixed historical snapshot; it does not update automatically when the cloud CSV changes. No Power BI Service link or GitHub remote has been verified. The planned no-cost Power BI connection uses work/school OneDrive or SharePoint and must pass a Service refresh-history check before automatic refresh is claimed. **Publish to web can expose underlying model data publicly**, so confirm redistribution rights and tenant permission first.

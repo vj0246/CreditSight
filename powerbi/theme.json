@@ -1,0 +1,11 @@
+{
+  "name": "Bank Loan | Midnight Ledger",
+  "dataColors": ["#5C9BE8", "#D86570"],
+  "background": "#0D1B2A",
+  "firstLevelElements": "#EFF5FA",
+  "secondLevelElements": "#BBCBDA",
+  "thirdLevelElements": "#7590A8",
+  "fourthLevelElements": "#9AAFC2",
+  "secondaryBackground": "#20354A",
+  "tableAccent": "#5C9BE8"
+}

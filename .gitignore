@@ -8,3 +8,5 @@
 *.pfx
 financial_loan.csv
 data/
+companion-site/
+__pycache__/
