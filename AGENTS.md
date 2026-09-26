@@ -20,7 +20,7 @@ Purpose: Analyze historical loan outcomes with MySQL and Python checks, publish 
 - Run `sql/02_basic_queries.sql` after profile checks pass; save results for Power BI reconciliation.
 - Run `python tools/profile_source.py` only to inspect the rejected copied CSV.
 - Run `python tools/check_official_archive.py` to inspect the original archive.
-- Run `python tools/export_companion_data.py`, then `npx next build`, `npm run lint`, and `npm run build` followed by `node --test tests/rendered-html.test.mjs` in `companion-site/` for the public snapshot. Vercel uses `npx next build`.
+- Run `python tools/export_companion_data.py`, then `npx next build`, `npm run lint`, and `npm test` in `companion-site/` for the public snapshot. Vercel uses `npx next build`.
 - Create the Power BI loan query from `powerbi/FactLoans_SharePoint.m`; Service refresh still needs signed-in verification.
 - Database SQL requires a local Workbench login; no unattended database credentials are stored.
 
