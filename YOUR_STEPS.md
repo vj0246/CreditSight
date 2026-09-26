@@ -7,7 +7,7 @@ Use this as a working checklist, not as a script to paste into MySQL. Complete d
 - You reported completing Days 1 and 2, including matching grade results. Local MySQL output remains user-reported; the prepared CSV was independently rechecked on September 26, 2026.
 - Code already prepared: MySQL schema, five baseline queries, three CTE analyses, a Power Query date table, 12 DAX measures, and a CSV verifier.
 - Not yet built or verified: the Power BI model, three report pages, PBIX, screenshots, Power BI Service link, and scheduled refresh. The saved `abc.pbix` is only 16 KB and has not been validated as a report.
-- The [Vercel dashboard](https://bank-loan-dashboard-site.vercel.app/) is public and serves the latest verified aggregate snapshot. [Dashboard source](https://github.com/vj0246/bank-loan-dashboard-site) and [SQL/Power BI source](https://github.com/vj0246/PowerBI_Dashboard) are on GitHub. The website is not a Power BI report and does not refresh when the cloud CSV changes.
+- The [Vercel dashboard](https://bank-loan-dashboard-site.vercel.app/) is public and serves the latest verified aggregate snapshot. [Dashboard source](https://github.com/vj0246/bank-loan-dashboard-site) and [SQL/Power BI source](https://github.com/vj0246/CreditSight) are on GitHub. The website is not a Power BI report and does not refresh when the cloud CSV changes.
 - You chose no-cost cloud refresh and confirmed work/school Microsoft 365 access. Power BI will read the OneDrive/SharePoint CSV; local MySQL remains the analysis and validation layer. Do not claim the published model queries MySQL.
 - Use `data/financial_loan_clean.csv`, not the older root `financial_loan.csv`. The older file has unreliable 2021 issue dates. The cleaned file contains 39,786 resolved loans issued from June 2007 through December 2011.
 - `issue_date` uses the first day of each issue **month** because the source has no exact issue day. `Charged Off` is an observed outcome, not a predicted default or a dollar loss.
@@ -216,7 +216,7 @@ Before placing visuals, import `powerbi/theme.json` from **View > Themes > Brows
 
 ### 4. Publish the project code
 
-**Do:** Keep the existing [analysis repository](https://github.com/vj0246/PowerBI_Dashboard) and [Vercel dashboard repository](https://github.com/vj0246/bank-loan-dashboard-site) current. Add validated screenshots after the PBIX exists. Include the PBIX only if the embedded data can be redistributed. Keep raw CSV/ZIP files, the installer, and credentials out of Git.
+**Do:** Keep the existing [analysis repository](https://github.com/vj0246/CreditSight) and [Vercel dashboard repository](https://github.com/vj0246/bank-loan-dashboard-site) current. Add validated screenshots after the PBIX exists. Include the PBIX only if the embedded data can be redistributed. Keep raw CSV/ZIP files, the installer, and credentials out of Git.
 
 **Why:** GitHub proves your reasoning and reproducible work; Power BI Service provides the interactive report. They serve different purposes.
 
@@ -246,6 +246,6 @@ Before placing visuals, import `powerbi/theme.json` from **View > Themes > Brows
 
 ## Submit now versus complete later
 
-**Submit now:** [Vercel dashboard](https://bank-loan-dashboard-site.vercel.app/) and [SQL/analysis repository](https://github.com/vj0246/PowerBI_Dashboard). Optionally add the [dashboard source repository](https://github.com/vj0246/bank-loan-dashboard-site). Describe this as a historical SQL/Python analysis with an interactive, aggregate-only web dashboard. Do not list Power BI as a completed project tool yet.
+**Submit now:** [Vercel dashboard](https://bank-loan-dashboard-site.vercel.app/) and [SQL/analysis repository](https://github.com/vj0246/CreditSight). Optionally add the [dashboard source repository](https://github.com/vj0246/bank-loan-dashboard-site). Describe this as a historical SQL/Python analysis with an interactive, aggregate-only web dashboard. Do not list Power BI as a completed project tool yet.
 
 **Still required for the original Power BI plan:** Send non-sensitive Day 1 `row_count`, status counts, and query 1 if independent MySQL reconciliation is needed. Confirm the prepared CSV is on your work/school OneDrive or SharePoint. Complete Days 3 through 6 in signed-in Power BI Desktop and Service, save a working three-page PBIX, validate measures against SQL, publish, and verify refresh history. No PBIX, Service refresh schedule, or public Power BI link can be claimed until those checks pass. Do not send credentials.
