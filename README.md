@@ -1,6 +1,6 @@
 # Bank Loan Credit Risk Dashboard
 
-Historical LendingClub loan origination and observed outcome analysis using MySQL 8, SQL CTEs, Power BI, Power Query, and DAX. The repository contains reproducible data preparation, SQL, and report formulas. A [public interactive companion dashboard](https://bank-loan-ledger-vj.neev-jain244.chatgpt.site) is live using verified aggregates only. **The Power BI PBIX and Service report are not built yet.** See [YOUR_STEPS.md](YOUR_STEPS.md) for signed-in actions.
+Historical LendingClub loan origination and observed outcome analysis using MySQL 8, SQL CTEs, Python, and a [public Vercel dashboard](https://bank-loan-dashboard-site.vercel.app/). This repository contains reproducible data preparation, SQL, and Power BI model definitions. The [dashboard source](https://github.com/vj0246/bank-loan-dashboard-site) is a separate repository. **The Power BI PBIX and Service report are not complete or verified.** See [YOUR_STEPS.md](YOUR_STEPS.md) for the remaining signed-in work.
 
 ## Source and scope
 
@@ -27,6 +27,13 @@ These values come from `python tools/verify_clean_data.py` on the prepared CSV. 
 
 High-DTI share is about 1.30 times low-DTI share, not the 2.5–3.5 times claimed by the initial project outline. This is an unadjusted association; grade, vintage, and other factors may confound it. `funded_amount` is original funded principal, **not** outstanding balance or credit loss. Monthly outcome rates group loans by origination month, not the month in which charge-off happened.
 
+## Resume-ready project description
+
+- Identified a 5.3x gap in observed charge-off share between Grade G (31.76%, 101/318) and Grade A (5.97%, 602/10,085) by cleaning and cross-checking 39,786 historical loans with MySQL CTEs and Python; documented cohort and sample-size limits for risk review.
+- Delivered a public, interactive Vercel dashboard covering $436.0M in funded principal and 55 origination months; built year-filtered grade, DTI, purpose, and trend views from aggregate-only data, with SQL `LAG()` checks separating issuance trends from eventual outcomes.
+
+These bullets describe measured findings and delivered work, not a proven reduction in defaults or a completed Power BI report.
+
 ## Reproduce
 
 1. Place the archive at `data/LoanStats3a.csv.zip` and run `python tools/prepare_official_data.py` followed by `python tools/verify_clean_data.py`.
@@ -35,6 +42,8 @@ High-DTI share is about 1.30 times low-DTI share, not the 2.5–3.5 times claime
 4. Upload the prepared CSV to work/school OneDrive or SharePoint. In Power BI Desktop, create `financial_loan` from `powerbi/FactLoans_SharePoint.m`, then create `DimDate` from `powerbi/DimDate.m`, the one-to-many date relationship, and the 12 formulas in `powerbi/measures.dax` as individual measures. MySQL is the independent SQL validation layer; Power BI reads the cloud CSV for refresh.
 5. Build Summary, Risk Analysis, and Monthly Trends pages per [YOUR_STEPS.md](YOUR_STEPS.md). Save the PBIX and screenshots only after SQL-to-DAX checks pass.
 
-## Publication status
+## Architecture and publication status
 
-The [companion dashboard](https://bank-loan-ledger-vj.neev-jain244.chatgpt.site) is public and interactive but is a fixed historical snapshot; it does not update automatically when the cloud CSV changes. No Power BI Service link or GitHub remote has been verified. The planned no-cost Power BI connection uses work/school OneDrive or SharePoint and must pass a Service refresh-history check before automatic refresh is claimed. **Publish to web can expose underlying model data publicly**, so confirm redistribution rights and tenant permission first.
+The pipeline is original LendingClub archive to cleaned 16-column CSV to independent MySQL and Python checks to grouped JSON to the [Vercel dashboard](https://bank-loan-dashboard-site.vercel.app/). The public site contains aggregate data only. It is a fixed snapshot and **does not refresh automatically** when the cloud CSV changes. The Power BI branch of the project is separate: a proposed SharePoint-file Power Query model, date table, and 12 DAX definitions are present, but no three-page PBIX, scheduled Service refresh, or public Power BI link has been verified.
+
+For an application today, submit the Vercel dashboard plus this analysis repository. Describe the project as SQL/Python analysis and a deployed interactive dashboard, not as a completed Power BI or automated-refresh implementation. A Power BI link belongs here only after the report opens without sign-in and refresh history proves the claimed schedule. **Publish to web can expose underlying model data publicly**; confirm redistribution rights and tenant permission first.
